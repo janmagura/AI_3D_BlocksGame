@@ -29,7 +29,7 @@ Navigate polycubes through a **7×7×12 wireframe pit**, rotate them in full 3D 
 
 ### 🎮 Core Gameplay
 - **True 3D Mechanics**: Move and rotate blocks along X, Y, and Z axes.
-- **Dynamic Camera**: Perspective view looking deep into the 3D tunnel.
+- **Adjustable Camera View**: Click and drag to rotate the camera, scroll to zoom in/out.
 - **Ghost Piece**: See exactly where your block will land.
 - **Layer Clearing**: Complete a full 7×7 horizontal plane to clear lines and score big.
 - **Progressive Difficulty**: Speed increases as you level up.
@@ -50,20 +50,28 @@ Navigate polycubes through a **7×7×12 wireframe pit**, rotate them in full 3D 
 
 ## 🎹 Controls
 
-Master the 3D space with these controls:
+### Keyboard Controls
+Master the 3D space with these keyboard controls:
 
 | Action | Key(s) | Description |
 | :--- | :---: | :--- |
 | **Move Left/Right** | `←` `→` | Shift along the X-axis |
 | **Move Forward/Back** | `↑` `↓` | Shift along the Z-axis (Depth) |
-| **Vertical Move** | `W` `S` | Move block Up/Down manually |
 | **Rotate X-Axis** | `A` `D` | Tilt forward/backward |
 | **Rotate Y-Axis** | `Q` `E` | Spin left/right (Yaw) |
-| **Rotate Z-Axis** | `Z` `C` | Roll clockwise/counter-clockwise |
+| **Rotate Z-Axis** | `W` `S` | Roll clockwise/counter-clockwise |
 | **Hard Drop** | `SPACE` | Instantly drop the piece |
 | **Pause/Resume** | `P` | Toggle game pause state |
 
-> 💡 **Pro Tip**: Use the **Ghost Piece** (transparent outline at the bottom) to plan your landing strategy!
+### Mouse Controls (Camera)
+Adjust your view of the 3D pit:
+
+| Action | Input | Description |
+| :--- | :---: | :--- |
+| **Rotate Camera** | `Click + Drag` | Pan around the pit to see from any angle |
+| **Zoom In/Out** | `Scroll Wheel` | Adjust camera distance (10-40 units) |
+
+> 💡 **Pro Tip**: Use the **Ghost Piece** (transparent outline at the bottom) to plan your landing strategy. Rotate the camera to get the best perspective!
 
 ---
 

@@ -32,6 +32,14 @@ class BlockOut {
         this.ghostGroup = null;
         this.stackedPieces = [];
         
+        // Camera controls
+        this.cameraAngleX = 0;
+        this.cameraAngleY = 0;
+        this.cameraDistance = 18;
+        this.isDragging = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
+        
         this.init();
     }
     
@@ -66,9 +74,7 @@ class BlockOut {
         this.mainScene = new THREE.Scene();
         this.mainScene.background = new THREE.Color(0x000000);
         
-        this.mainCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-        this.mainCamera.position.set(0, 6, 18);
-        this.mainCamera.lookAt(0, 5, 0);
+        this.updateCameraPosition();
         
         this.mainRenderer = new THREE.WebGLRenderer({ antialias: true });
         this.mainRenderer.setSize(width, height);
@@ -80,6 +86,9 @@ class BlockOut {
         // Add lighting
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
         this.mainScene.add(ambientLight);
+        
+        // Setup camera controls
+        this.setupCameraControls();
     }
     
     setupNextPieceScene() {
@@ -548,6 +557,7 @@ class BlockOut {
     }
     
     setupControls() {
+        // Keyboard controls for game
         document.addEventListener('keydown', (e) => {
             if (this.isGameOver) {
                 if (e.code === 'Space') {
@@ -595,6 +605,53 @@ class BlockOut {
                     break;
             }
         });
+        
+        // Mouse controls for camera
+        const canvas = this.mainRenderer.domElement;
+        
+        canvas.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!this.isDragging) return;
+            
+            const deltaX = e.clientX - this.lastMouseX;
+            const deltaY = e.clientY - this.lastMouseY;
+            
+            this.cameraAngleX += deltaX * 0.005;
+            this.cameraAngleY += deltaY * 0.005;
+            
+            // Limit vertical angle to avoid flipping
+            this.cameraAngleY = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.cameraAngleY));
+            
+            this.updateCameraPosition();
+            
+            this.lastMouseX = e.clientX;
+            this.lastMouseY = e.clientY;
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            this.isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+        
+        canvas.addEventListener('mouseleave', () => {
+            this.isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            this.cameraDistance += e.deltaY * 0.01;
+            this.cameraDistance = Math.max(10, Math.min(40, this.cameraDistance));
+            this.updateCameraPosition();
+        }, { passive: false });
+        
+        canvas.style.cursor = 'grab';
     }
     
     togglePause() {
@@ -659,6 +716,21 @@ class BlockOut {
         document.getElementById('cubes-played').textContent = this.cubesPlayed;
         document.getElementById('high-score').textContent = this.highScore;
         document.getElementById('level').textContent = this.level;
+    }
+    
+    updateCameraPosition() {
+        if (!this.mainCamera) return;
+        
+        const x = this.cameraDistance * Math.sin(this.cameraAngleX) * Math.cos(this.cameraAngleY);
+        const y = this.cameraDistance * Math.sin(this.cameraAngleY) + 6;
+        const z = this.cameraDistance * Math.cos(this.cameraAngleX) * Math.cos(this.cameraAngleY);
+        
+        this.mainCamera.position.set(x, y, z);
+        this.mainCamera.lookAt(0, 5, 0);
+    }
+    
+    setupCameraControls() {
+        // Camera controls are setup in setupControls method
     }
     
     animate(currentTime = 0) {
