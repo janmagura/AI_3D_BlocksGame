@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLOCK OUT - 3D Block Stacking Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            font-family: 'Press Start 2P', monospace;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        #game-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+        }
+
+        #left-panel {
+            width: 200px;
+            background: linear-gradient(180deg, #1a1a4e 0%, #0d0d2b 100%);
+            border: 3px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        #right-panel {
+            width: 220px;
+            background: linear-gradient(180deg, #1a1a4e 0%, #0d0d2b 100%);
+            border: 3px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        #canvas-container {
+            position: relative;
+            border: 3px solid #00ff00;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.4);
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            color: #00ffff;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #ff69b4;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        #game-title {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(180deg, #0066ff 0%, #ff0066 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 10px rgba(0, 102, 255, 0.5));
+        }
+
+        #next-piece-canvas {
+            width: 100%;
+            height: 120px;
+            background: #000;
+            border: 2px solid #00ffff;
+            border-radius: 5px;
+        }
+
+        .controls-info {
+            font-size: 8px;
+            color: #aaa;
+            margin-top: 20px;
+            line-height: 1.8;
+        }
+
+        .controls-info span {
+            color: #ffff00;
+        }
+
+        #pause-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            color: #ffff00;
+            text-shadow: 0 0 20px #ffff00;
+            display: none;
+            z-index: 100;
+        }
+
+        #game-over-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+            display: none;
+            z-index: 100;
+            text-align: center;
+        }
+
+        #game-over-overlay p {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        .pit-info {
+            font-size: 8px;
+            color: #888;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="left-panel">
+            <div class="panel-title">LEVEL</div>
+            <div class="stat-value" id="level">1</div>
+            
+            <div class="panel-title" style="margin-top: 30px;">NEXT PIECE</div>
+            <canvas id="next-piece-canvas" width="180" height="120"></canvas>
+            
+            <div class="controls-info">
+                <span>←→</span> Move X<br>
+                <span>↑↓</span> Move Y/Rotate<br>
+                <span>W/S</span> Rotate Z<br>
+                <span>A/D</span> Rotate X<br>
+                <span>Q/E</span> Rotate Y<br>
+                <span>SPACE</span> Drop<br>
+                <span>P</span> Pause
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <div id="pause-overlay">PAUSED</div>
+            <div id="game-over-overlay">
+                GAME OVER
+                <p>Press SPACE to restart</p>
+            </div>
+        </div>
+
+        <div id="right-panel">
+            <div id="game-title">BLOCK OUT</div>
+            
+            <div class="stat-label">SCORE</div>
+            <div class="stat-value" id="score">0</div>
+            
+            <div class="stat-label">CUBES PLAYED</div>
+            <div class="stat-value" id="cubes-played">0</div>
+            
+            <div class="stat-label">HIGH SCORE</div>
+            <div class="stat-value" id="high-score">0</div>
+            
+            <div class="stat-label">PIT DIMENSIONS</div>
+            <div class="stat-value" style="font-size: 12px;">7 × 7 × 12</div>
+            
+            <div class="stat-label">BLOCK SET</div>
+            <div class="stat-value">BASIC</div>
+            
+            <div class="pit-info">Green wireframe grid<br>White wireframe blocks</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
